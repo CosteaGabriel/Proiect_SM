@@ -1,1 +1,6 @@
 # Proiect_SM
+
+
+
+
+YOLO
