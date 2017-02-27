@@ -91,6 +91,7 @@ BOOL CProiect_SMDlg::OnInitDialog()
 		int nWidth = 100,
 		int nSubItem = -1
 		);
+	//Hello world
 
 	if (Magenta1.InsertColumn(1, TEXT("Col1")) < 0)
 		printf("error");
