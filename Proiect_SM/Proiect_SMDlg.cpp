@@ -91,7 +91,7 @@ BOOL CProiect_SMDlg::OnInitDialog()
 		int nWidth = 100,
 		int nSubItem = -1
 		);
-	int n;
+
 	if (Magenta1.InsertColumn(1, TEXT("Col1")) < 0)
 		printf("error");
 	if(Magenta1.InsertColumn(2, TEXT("Col2"))<0)
@@ -196,12 +196,20 @@ void CProiect_SMDlg::OnBnClickedButton1()
 		UINT nStateMask,
 		int nImage,
 		LPARAM lParam
-		);	BOOL SetItemText(
+		);
+
+	BOOL SetItemText(
 		int nItem,
 		int nSubItem,
 		LPCTSTR lpszText
 		);
-		if(Magenta1.InsertItem(1,0) < 0)		printf("error");	if (Magenta1.SetItemText(1, 0, TEXT("ELEMENT 1")) == 0)		printf("error");
+	
+
+	if(Magenta1.InsertItem(1,0) < 0)
+		printf("error");
+	if (Magenta1.SetItemText(1, 0, TEXT("ELEMENT 1")) == 0)
+		printf("error");
+
 }
 
 
@@ -227,12 +235,17 @@ void CProiect_SMDlg::Add_Item_Col2()
 		UINT nStateMask,
 		int nImage,
 		LPARAM lParam
-		);	BOOL SetItemText(
+		);
+
+	BOOL SetItemText(
 		int nItem,
 		int nSubItem,
 		LPCTSTR lpszText
 		);
 
-	if (Magenta1.InsertItem(1, TEXT("EL1")) < 0)		printf("error");	if (Magenta1.SetItemText(1, 1, TEXT("ELEMENT 2")) == 0)		printf("error");
+	if (Magenta1.InsertItem(1, TEXT("EL1")) < 0)
+		printf("error");
+	if (Magenta1.SetItemText(1, 1, TEXT("ELEMENT 2")) == 0)
+		printf("error");
 	
 }
