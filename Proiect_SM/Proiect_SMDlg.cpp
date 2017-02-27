@@ -12,8 +12,13 @@
 #endif
 
 
+//Global variables
+int max_numbers_of_lines = 0;
+int number_lines_col1 = 0;
+int number_lines_col2 = 0;
+int number_lines_col3 = 0;
+
 // CAboutDlg dialog used for App About
-int max_numbers_of_lines;
 class CAboutDlg : public CDialogEx
 {
 public:
@@ -65,6 +70,7 @@ BEGIN_MESSAGE_MAP(CProiect_SMDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CProiect_SMDlg::Add_Item_Col1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CProiect_SMDlg::Add_Item_Col2)
+	ON_BN_CLICKED(IDC_BUTTON3, &CProiect_SMDlg::Add_Item_Col3)
 END_MESSAGE_MAP()
 
 
@@ -74,12 +80,12 @@ BOOL CProiect_SMDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
+	//Inserare coloane
 	int InsertColumn(
 		int nCol,
 		const LVCOLUMN* pColumn
@@ -87,18 +93,31 @@ BOOL CProiect_SMDlg::OnInitDialog()
 	int InsertColumn(
 		int nCol,
 		LPCTSTR lpszColumnHeading,
-		int nFormat = LVCFMT_LEFT,
-		int nWidth = 100,
+		int nFormat = LVCFMT_CENTER,
+		int nWidth = 1000,
 		int nSubItem = -1
 		);
-	//Hello world
 
+	BOOL SetColumnWidth(
+		int nCol,
+		int cx
+		);
+	//inseram 3 coloana in List Control
 	if (Magenta1.InsertColumn(1, TEXT("Col1")) < 0)
 		printf("error");
 	if(Magenta1.InsertColumn(2, TEXT("Col2"))<0)
 		printf("error");
 	if(Magenta1.InsertColumn(3, TEXT("Col3"))<0)
 		printf("error");
+
+	//setam dimensiunea coloanei la 150 pixeli
+	if(Magenta1.SetColumnWidth(0, 150) != 0)
+		printf("error");
+	if(Magenta1.SetColumnWidth(1, 150) != 0)
+		printf("error");
+	if(Magenta1.SetColumnWidth(2, 150) != 0)
+		printf("error");
+
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != NULL)
@@ -205,12 +224,20 @@ void CProiect_SMDlg::Add_Item_Col1()
 		LPCTSTR lpszText
 		);
 	
-
-	if(Magenta1.InsertItem(1,0) < 0)
-		printf("error");
-	if (Magenta1.SetItemText(1, 0, TEXT("ELEMENT 1")) == 0)
-		printf("error");
-
+	if (number_lines_col1 < max_numbers_of_lines)  //daca in coloana nu avem mai multe linii de cat numarul maxim de linii  
+	{                                              //at scriem doar textul in indexul cu valoarea stocata in number_lines_col1
+		if (Magenta1.SetItemText(number_lines_col1, 0, TEXT("ELEMENT 1")) == 0)
+			printf("error");
+		number_lines_col1++;
+	}
+	else{											//altfel inseram o linie si scriem textul dar si crestem numarul maxim de linii
+		if (Magenta1.InsertItem(number_lines_col1, 0) < 0)
+			printf("error");
+		if (Magenta1.SetItemText(number_lines_col1, 0, TEXT("ELEMENT 1")) == 0)
+			printf("error");
+		number_lines_col1++;
+		max_numbers_of_lines++;
+	}
 }
 
 
@@ -244,9 +271,68 @@ void CProiect_SMDlg::Add_Item_Col2()
 		LPCTSTR lpszText
 		);
 
-	if (Magenta1.InsertItem(1, TEXT("EL1")) < 0)
-		printf("error");
-	if (Magenta1.SetItemText(1, 1, TEXT("ELEMENT 2")) == 0)
-		printf("error");
-	
+
+
+	if (number_lines_col2 < max_numbers_of_lines)    
+	{
+		if (Magenta1.SetItemText(number_lines_col2, 1, TEXT("ELEMENT 2")) == 0)
+			printf("error");
+		number_lines_col2++;
+	}
+	else{
+		if (Magenta1.InsertItem(number_lines_col2, 0) < 0)
+			printf("error");
+		if (Magenta1.SetItemText(number_lines_col2, 1, TEXT("ELEMENT 2")) == 0)
+			printf("error");
+		number_lines_col2++;
+		max_numbers_of_lines++;
+	}
+}
+
+
+void CProiect_SMDlg::Add_Item_Col3()
+{
+	int InsertItem(
+		const LVITEM* pItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem,
+		int nImage
+		);
+	int InsertItem(
+		UINT nMask,
+		int nItem,
+		LPCTSTR lpszItem,
+		UINT nState,
+		UINT nStateMask,
+		int nImage,
+		LPARAM lParam
+		);
+
+	BOOL SetItemText(
+		int nItem,
+		int nSubItem,
+		LPCTSTR lpszText
+		);
+
+
+	if (number_lines_col3 < max_numbers_of_lines)
+	{
+		if (Magenta1.SetItemText(number_lines_col3, 2, TEXT("ELEMENT 3")) == 0)
+			printf("error");
+		number_lines_col3++;
+	}
+	else{
+		if (Magenta1.InsertItem(number_lines_col3, 0) < 0)
+			printf("error");
+		if (Magenta1.SetItemText(number_lines_col3, 2, TEXT("ELEMENT 3")) == 0)
+			printf("error");
+		number_lines_col3++;
+		max_numbers_of_lines++;
+	}
 }

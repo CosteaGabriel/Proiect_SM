@@ -34,4 +34,5 @@ public:
 	afx_msg void Add_Item_Col1();
 	CListCtrl Magenta1;
 	afx_msg void Add_Item_Col2();
+	afx_msg void Add_Item_Col3();
 };
