@@ -63,7 +63,7 @@ BEGIN_MESSAGE_MAP(CProiect_SMDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CProiect_SMDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON1, &CProiect_SMDlg::Add_Item_Col1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CProiect_SMDlg::Add_Item_Col2)
 END_MESSAGE_MAP()
 
@@ -91,7 +91,8 @@ BOOL CProiect_SMDlg::OnInitDialog()
 		int nWidth = 100,
 		int nSubItem = -1
 		);
-	int n;
+	//Hello world
+
 	if (Magenta1.InsertColumn(1, TEXT("Col1")) < 0)
 		printf("error");
 	if(Magenta1.InsertColumn(2, TEXT("Col2"))<0)
@@ -174,7 +175,7 @@ HCURSOR CProiect_SMDlg::OnQueryDragIcon()
 
 
 
-void CProiect_SMDlg::OnBnClickedButton1()
+void CProiect_SMDlg::Add_Item_Col1()
 {
 	int InsertItem(
 		const LVITEM* pItem
@@ -196,12 +197,20 @@ void CProiect_SMDlg::OnBnClickedButton1()
 		UINT nStateMask,
 		int nImage,
 		LPARAM lParam
-		);	BOOL SetItemText(
+		);
+
+	BOOL SetItemText(
 		int nItem,
 		int nSubItem,
 		LPCTSTR lpszText
 		);
-		if(Magenta1.InsertItem(1,0) < 0)		printf("error");	if (Magenta1.SetItemText(1, 0, TEXT("ELEMENT 1")) == 0)		printf("error");
+	
+
+	if(Magenta1.InsertItem(1,0) < 0)
+		printf("error");
+	if (Magenta1.SetItemText(1, 0, TEXT("ELEMENT 1")) == 0)
+		printf("error");
+
 }
 
 
@@ -227,12 +236,17 @@ void CProiect_SMDlg::Add_Item_Col2()
 		UINT nStateMask,
 		int nImage,
 		LPARAM lParam
-		);	BOOL SetItemText(
+		);
+
+	BOOL SetItemText(
 		int nItem,
 		int nSubItem,
 		LPCTSTR lpszText
 		);
 
-	if (Magenta1.InsertItem(1, TEXT("EL1")) < 0)		printf("error");	if (Magenta1.SetItemText(1, 1, TEXT("ELEMENT 2")) == 0)		printf("error");
+	if (Magenta1.InsertItem(1, TEXT("EL1")) < 0)
+		printf("error");
+	if (Magenta1.SetItemText(1, 1, TEXT("ELEMENT 2")) == 0)
+		printf("error");
 	
 }

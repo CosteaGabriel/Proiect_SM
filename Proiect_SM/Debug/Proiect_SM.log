@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿Build started 2/25/2017 10:20:05 PM.
      1>Project "E:\AutomaticaSiCalculatoare\Anul_III\Sem_II\Sisteme cu Microprocesoare\Proiect_SM\Proiect_SM\Proiect_SM.vcxproj" on node 2 (Build target(s)).
      1>Link:
@@ -7,3 +8,27 @@
 Build succeeded.
 
 Time Elapsed 00:00:00.50
+=======
+﻿Build started 2/27/2017 3:26:55 PM.
+     1>Project "E:\AutomaticaSiCalculatoare\Anul_III\Proiect SM-repo\Proiect_SM\Proiect_SM\Proiect_SM.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"Debug\Proiect_SM.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\Proiect_SM.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Proiect_SM.cpp Proiect_SMDlg.cpp
+         Proiect_SMDlg.cpp
+         Proiect_SM.cpp
+         Generating Code...
+       ResourceCompile:
+         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\rc.exe /D _DEBUG /D _UNICODE /D UNICODE /l"0x0409" /IDebug\ /nologo /fo"Debug\Proiect_SM.res" Proiect_SM.rc 
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\AutomaticaSiCalculatoare\Anul_III\Proiect SM-repo\Proiect_SM\Debug\Proiect_SM.exe" /INCREMENTAL /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"E:\AutomaticaSiCalculatoare\Anul_III\Proiect SM-repo\Proiect_SM\Debug\Proiect_SM.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\AutomaticaSiCalculatoare\Anul_III\Proiect SM-repo\Proiect_SM\Debug\Proiect_SM.lib" /MACHINE:X86 Debug\Proiect_SM.res
+         Debug\Proiect_SM.obj
+         Debug\Proiect_SMDlg.obj
+         Debug\stdafx.obj
+         Proiect_SM.vcxproj -> E:\AutomaticaSiCalculatoare\Anul_III\Proiect SM-repo\Proiect_SM\Debug\Proiect_SM.exe
+     1>Done Building Project "E:\AutomaticaSiCalculatoare\Anul_III\Proiect SM-repo\Proiect_SM\Proiect_SM\Proiect_SM.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:05.12
+>>>>>>> c6dc0287bc2335707bd804766d9e8716401b4d99
