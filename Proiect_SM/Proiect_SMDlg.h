@@ -31,7 +31,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButton1();
+	afx_msg void Add_Item_Col1();
 	CListCtrl Magenta1;
 	afx_msg void Add_Item_Col2();
 };

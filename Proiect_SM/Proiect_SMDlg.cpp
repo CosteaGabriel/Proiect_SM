@@ -63,7 +63,7 @@ BEGIN_MESSAGE_MAP(CProiect_SMDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CProiect_SMDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON1, &CProiect_SMDlg::Add_Item_Col1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CProiect_SMDlg::Add_Item_Col2)
 END_MESSAGE_MAP()
 
@@ -175,7 +175,7 @@ HCURSOR CProiect_SMDlg::OnQueryDragIcon()
 
 
 
-void CProiect_SMDlg::OnBnClickedButton1()
+void CProiect_SMDlg::Add_Item_Col1()
 {
 	int InsertItem(
 		const LVITEM* pItem
