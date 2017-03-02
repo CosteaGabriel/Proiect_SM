@@ -103,11 +103,11 @@ BOOL CProiect_SMDlg::OnInitDialog()
 		int cx
 		);
 	//inseram 3 coloana in List Control
-	if (Magenta1.InsertColumn(1, TEXT("Col1")) < 0)
+	if (Magenta1.InsertColumn(1, TEXT("Page Size")) < 0)
 		printf("error");
-	if(Magenta1.InsertColumn(2, TEXT("Col2"))<0)
+	if(Magenta1.InsertColumn(2, TEXT("Perfomance Info"))<0)
 		printf("error");
-	if(Magenta1.InsertColumn(3, TEXT("Col3"))<0)
+	if(Magenta1.InsertColumn(3, TEXT("Global Memory Status"))<0)
 		printf("error");
 
 	//setam dimensiunea coloanei la 150 pixeli
@@ -217,23 +217,32 @@ void CProiect_SMDlg::Add_Item_Col1()
 		int nImage,
 		LPARAM lParam
 		);
-
 	BOOL SetItemText(
 		int nItem,
 		int nSubItem,
 		LPCTSTR lpszText
 		);
+	//Algroritmul pentru a seta informatia sitemuluui pe prima coloana
+	/////////////////////////////////////////////////////////////
+	SYSTEM_INFO SysInfo;
+	wchar_t buffer[256];  //variabila pentru a convertii SysInfo care ii de tipul SYSTEM_INFO
+	CString t;					  //intr-o variabila de tipul LPCTSTR
+
+	GetSystemInfo(&SysInfo);
 	
+	t.Format(_T("%u"), SysInfo.dwPageSize);
+
+	//////////////////////////////////////////////////////////////
 	if (number_lines_col1 < max_numbers_of_lines)  //daca in coloana nu avem mai multe linii de cat numarul maxim de linii  
 	{                                              //at scriem doar textul in indexul cu valoarea stocata in number_lines_col1
-		if (Magenta1.SetItemText(number_lines_col1, 0, TEXT("ELEMENT 1")) == 0)
+		if (Magenta1.SetItemText(number_lines_col1, 0, t) == 0)
 			printf("error");
 		number_lines_col1++;
 	}
 	else{											//altfel inseram o linie si scriem textul dar si crestem numarul maxim de linii
 		if (Magenta1.InsertItem(number_lines_col1, 0) < 0)
 			printf("error");
-		if (Magenta1.SetItemText(number_lines_col1, 0, TEXT("ELEMENT 1")) == 0)
+		if (Magenta1.SetItemText(number_lines_col1, 0, t) == 0)
 			printf("error");
 		number_lines_col1++;
 		max_numbers_of_lines++;
