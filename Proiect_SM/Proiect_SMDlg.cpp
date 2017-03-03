@@ -7,9 +7,14 @@
 #include "Proiect_SMDlg.h"
 #include "afxdialogex.h"
 
+#include <Psapi.h>
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+
 
 
 //Global variables
@@ -103,15 +108,15 @@ BOOL CProiect_SMDlg::OnInitDialog()
 		int cx
 		);
 	//inseram 3 coloana in List Control
-	if (Magenta1.InsertColumn(1, TEXT("Page Size")) < 0)
+	if (Magenta1.InsertColumn(1, TEXT("Proprietate")) < 0)
 		printf("error");
-	if(Magenta1.InsertColumn(2, TEXT("Perfomance Info"))<0)
+	if(Magenta1.InsertColumn(2, TEXT("Valoarea")) < 0)
 		printf("error");
-	if(Magenta1.InsertColumn(3, TEXT("Global Memory Status"))<0)
+	if(Magenta1.InsertColumn(3, TEXT("Unitatea de masura"))<0)
 		printf("error");
 
 	//setam dimensiunea coloanei la 150 pixeli
-	if(Magenta1.SetColumnWidth(0, 150) != 0)
+	if(Magenta1.SetColumnWidth(0, 200) != 0)
 		printf("error");
 	if(Magenta1.SetColumnWidth(1, 150) != 0)
 		printf("error");
@@ -223,17 +228,125 @@ void CProiect_SMDlg::Add_Item_Col1()
 		LPCTSTR lpszText
 		);
 	//Algroritmul pentru a seta informatia sitemuluui pe prima coloana
-	/////////////////////////////////////////////////////////////
-	SYSTEM_INFO SysInfo;
-	wchar_t buffer[256];  //variabila pentru a convertii SysInfo care ii de tipul SYSTEM_INFO
-	CString t;					  //intr-o variabila de tipul LPCTSTR
-
-	GetSystemInfo(&SysInfo);
 	
-	t.Format(_T("%u"), SysInfo.dwPageSize);
+	SYSTEM_INFO SysInfo;
+ //variabila pentru a convertii SysInfo care ii de tipul SYSTEM_INFO
+	CString PageSize, MinimVirtualMem,MaximVirtualMem;					  //intr-o variabila de tipul LPCTSTR
 
-	//////////////////////////////////////////////////////////////
-	if (number_lines_col1 < max_numbers_of_lines)  //daca in coloana nu avem mai multe linii de cat numarul maxim de linii  
+	Magenta1.DeleteAllItems();
+
+	GetSystemInfo(&SysInfo); // Copy the hardware information to the SYSTEM_INFO structure. 
+ 
+	PageSize.Format(_T("%u"), SysInfo.dwPageSize);
+
+	// Display the contents of the SYSTEM_INFO structure. 
+
+	if (Magenta1.InsertItem(0, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(0, 0, TEXT("Dim pag memorie")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(0, 1, PageSize) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(0, 2, TEXT("KB")) == 0)
+		printf("error");
+	/////////////////////////////////////////////
+
+	MinimVirtualMem.Format(_T("%u"), SysInfo.lpMinimumApplicationAddress);
+
+	if (Magenta1.InsertItem(1, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(1, 0, TEXT("Adrs. minima de mem virt")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(1, 1, MinimVirtualMem) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(1, 2, 0) == 0)
+		printf("error");
+
+	MaximVirtualMem.Format(_T("%u"), SysInfo.lpMaximumApplicationAddress);
+
+	if (Magenta1.InsertItem(2, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(2, 0, TEXT("Adrs. maxima de mem virt")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(2, 1, MaximVirtualMem) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(2, 2, 0) == 0)
+		printf("error");
+
+
+	MEMORYSTATUSEX totalMemPhysichal;
+	CString totalAvlMem, memSOInfo, totalVirtual, availableVirt, memoryload;
+
+	GlobalMemoryStatusEx(&totalMemPhysichal);
+
+	totalAvlMem.Format(_T("%u"), totalMemPhysichal.ullAvailPhys);
+
+	if (Magenta1.InsertItem(3, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(3, 0, TEXT("Total avl. mem")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(3, 1, totalAvlMem) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(3, 2, TEXT("KB")) == 0)
+		printf("error");
+
+	_PERFORMANCE_INFORMATION memSO;
+
+	GetPerformanceInfo(&memSO, sizeof(memSO));
+
+	memSOInfo.Format(_T("%u"), memSO.KernelTotal);
+	if (Magenta1.InsertItem(4, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(4, 0, TEXT("Total SO mem")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(4, 1, memSOInfo) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(4, 2, TEXT("KB")) == 0)
+		printf("error");
+
+
+
+	totalVirtual.Format(_T("%u"), totalMemPhysichal.ullTotalVirtual);
+
+	if (Magenta1.InsertItem(5, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(5, 0, TEXT("Total virtual mem")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(5, 1, totalVirtual) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(5, 2, TEXT("KB")) == 0)
+		printf("error");
+
+	availableVirt.Format(_T("%u"), totalMemPhysichal.ullAvailVirtual);
+	if (Magenta1.InsertItem(6, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(6, 0, TEXT("Available virtual mem")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(6, 1, availableVirt) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(6, 2, TEXT("KB")) == 0)
+		printf("error");
+
+	memoryload.Format(_T("%d"), totalMemPhysichal.dwMemoryLoad);
+	if (Magenta1.InsertItem(7, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(7, 0, TEXT("Memory load")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(7, 1, memoryload) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(7, 2, 0) == 0)
+		printf("error");
+
+
+	/*if (number_lines_col1 < max_numbers_of_lines)  //daca in coloana nu avem mai multe linii de cat numarul maxim de linii  
 	{                                              //at scriem doar textul in indexul cu valoarea stocata in number_lines_col1
 		if (Magenta1.SetItemText(number_lines_col1, 0, t) == 0)
 			printf("error");
@@ -246,9 +359,10 @@ void CProiect_SMDlg::Add_Item_Col1()
 			printf("error");
 		number_lines_col1++;
 		max_numbers_of_lines++;
-	}
-}
+	}*/
 
+
+}
 
 void CProiect_SMDlg::Add_Item_Col2()
 {
