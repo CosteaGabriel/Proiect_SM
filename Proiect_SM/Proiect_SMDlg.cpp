@@ -201,7 +201,18 @@ HCURSOR CProiect_SMDlg::OnQueryDragIcon()
 
 void CProiect_SMDlg::Add_Item_Col1()
 {
-	int InsertItem(
+	SYSTEM_INFO SysInfo;
+	MEMORYSTATUSEX MemoryInfo;
+	_PERFORMANCE_INFORMATION PerformanceInfo;			
+
+	MemoryInfo.dwLength = sizeof(MemoryInfo);
+
+	wchar_t buffer[500];								//variabila folosita pentru stocarea si afisarea informatiei
+
+	Magenta1.DeleteAllItems();							//stergem toate elementele din ListControl inainte sa le afisam pe cele noi
+
+
+	int InsertItem(										//functie pentru inserarea unei linii
 		const LVITEM* pItem
 		);
 	int InsertItem(
@@ -222,127 +233,134 @@ void CProiect_SMDlg::Add_Item_Col1()
 		int nImage,
 		LPARAM lParam
 		);
-	BOOL SetItemText(
+
+	BOOL SetItemText(					//functie pt setarea textului unei linii
 		int nItem,
 		int nSubItem,
 		LPCTSTR lpszText
 		);
-	//Algroritmul pentru a seta informatia sitemuluui pe prima coloana
-	
-	SYSTEM_INFO SysInfo;
- //variabila pentru a convertii SysInfo care ii de tipul SYSTEM_INFO
-	CString PageSize, MinimVirtualMem,MaximVirtualMem;					  //intr-o variabila de tipul LPCTSTR
 
-	Magenta1.DeleteAllItems();
+	//functii pentru aflarea informatiei HW-ului
+	GetPerformanceInfo(&PerformanceInfo, sizeof(PerformanceInfo));
+	GetSystemInfo(&SysInfo); 
+	GlobalMemoryStatusEx(&MemoryInfo);
 
-	GetSystemInfo(&SysInfo); // Copy the hardware information to the SYSTEM_INFO structure. 
- 
-	PageSize.Format(_T("%u"), SysInfo.dwPageSize);
-
-	// Display the contents of the SYSTEM_INFO structure. 
+	//Afisam page size
+	swprintf_s(buffer, 500, L"%d",  SysInfo.dwPageSize);
 
 	if (Magenta1.InsertItem(0, 0) < 0)
 		printf("error");
 
 	if (Magenta1.SetItemText(0, 0, TEXT("Dim pag memorie")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(0, 1, PageSize) == 0)
+	if (Magenta1.SetItemText(0, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(0, 2, TEXT("KB")) == 0)
+	if (Magenta1.SetItemText(0, 2, TEXT("bytes")) == 0)
 		printf("error");
-	/////////////////////////////////////////////
 
-	MinimVirtualMem.Format(_T("%u"), SysInfo.lpMinimumApplicationAddress);
+	//Afisam minim virtual memory
+	swprintf_s(buffer, 500, L"%lu", SysInfo.lpMinimumApplicationAddress);
 
 	if (Magenta1.InsertItem(1, 0) < 0)
 		printf("error");
 
 	if (Magenta1.SetItemText(1, 0, TEXT("Adrs. minima de mem virt")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(1, 1, MinimVirtualMem) == 0)
+	if (Magenta1.SetItemText(1, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(1, 2, 0) == 0)
+	if (Magenta1.SetItemText(1, 2, TEXT("Adress")) == 0)
 		printf("error");
-
-	MaximVirtualMem.Format(_T("%u"), SysInfo.lpMaximumApplicationAddress);
+	
+	//Afisam maxim virtual memory
+	swprintf_s(buffer, 500, L"%lu", SysInfo.lpMaximumApplicationAddress);
 
 	if (Magenta1.InsertItem(2, 0) < 0)
 		printf("error");
 
 	if (Magenta1.SetItemText(2, 0, TEXT("Adrs. maxima de mem virt")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(2, 1, MaximVirtualMem) == 0)
+	if (Magenta1.SetItemText(2, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(2, 2, 0) == 0)
+	if (Magenta1.SetItemText(2, 2, TEXT("Adress")) == 0)
 		printf("error");
 
-
-	MEMORYSTATUSEX totalMemPhysichal;
-	CString totalAvlMem, memSOInfo, totalVirtual, availableVirt, memoryload;
-
-	GlobalMemoryStatusEx(&totalMemPhysichal);
-
-	totalAvlMem.Format(_T("%u"), totalMemPhysichal.ullAvailPhys);
+	//Afisam taotal memory space
+	swprintf_s(buffer, 500, L"%lu", MemoryInfo.ullTotalPhys);
 
 	if (Magenta1.InsertItem(3, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(3, 0, TEXT("Total avl. mem")) == 0)
+	if (Magenta1.SetItemText(3, 0, TEXT("Total memory")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(3, 1, totalAvlMem) == 0)
+	if (Magenta1.SetItemText(3, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(3, 2, TEXT("KB")) == 0)
+	if (Magenta1.SetItemText(3, 2, TEXT("bytes")) == 0)
 		printf("error");
 
-	_PERFORMANCE_INFORMATION memSO;
 
-	GetPerformanceInfo(&memSO, sizeof(memSO));
+	swprintf_s(buffer, 500, L"%lu", MemoryInfo.ullAvailPhys);
 
-	memSOInfo.Format(_T("%u"), memSO.KernelTotal);
 	if (Magenta1.InsertItem(4, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(4, 0, TEXT("Total SO mem")) == 0)
+	if (Magenta1.SetItemText(4, 0, TEXT("Total avl. mem")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(4, 1, memSOInfo) == 0)
+	if (Magenta1.SetItemText(4, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(4, 2, TEXT("KB")) == 0)
+	if (Magenta1.SetItemText(4, 2, TEXT("bytes")) == 0)
 		printf("error");
-
-
-
-	totalVirtual.Format(_T("%u"), totalMemPhysichal.ullTotalVirtual);
+	
+	
+	swprintf_s(buffer, 500, L"%u", PerformanceInfo.KernelTotal);
 
 	if (Magenta1.InsertItem(5, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(5, 0, TEXT("Total virtual mem")) == 0)
+	if (Magenta1.SetItemText(5, 0, TEXT("Total SO mem")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(5, 1, totalVirtual) == 0)
+	if (Magenta1.SetItemText(5, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(5, 2, TEXT("KB")) == 0)
+	if (Magenta1.SetItemText(5, 2, TEXT("pages")) == 0)
 		printf("error");
+	
 
-	availableVirt.Format(_T("%u"), totalMemPhysichal.ullAvailVirtual);
+	swprintf_s(buffer, 500, L"%u", MemoryInfo.ullTotalVirtual);
+	
 	if (Magenta1.InsertItem(6, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(6, 0, TEXT("Available virtual mem")) == 0)
+	if (Magenta1.SetItemText(6, 0, TEXT("Total virtual mem")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(6, 1, availableVirt) == 0)
+	if (Magenta1.SetItemText(6, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(6, 2, TEXT("KB")) == 0)
+	if (Magenta1.SetItemText(6, 2, TEXT("bytes")) == 0)
 		printf("error");
 
-	memoryload.Format(_T("%d"), totalMemPhysichal.dwMemoryLoad);
+
+	
+	swprintf_s(buffer, 500, L"%u", MemoryInfo.ullAvailVirtual);
+
 	if (Magenta1.InsertItem(7, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(7, 0, TEXT("Memory load")) == 0)
+	if (Magenta1.SetItemText(7, 0, TEXT("Available virtual mem")) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(7, 1, memoryload) == 0)
+	if (Magenta1.SetItemText(7, 1, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(7, 2, 0) == 0)
+	if (Magenta1.SetItemText(7, 2, TEXT("bytes")) == 0)
+	    printf("error");
+
+
+	swprintf_s(buffer, 500, L"%d", MemoryInfo.dwMemoryLoad);
+
+	if (Magenta1.InsertItem(8, 0) < 0)
+		printf("error");
+
+	if (Magenta1.SetItemText(8, 0, TEXT("Memory load")) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(8, 1, buffer) == 0)
+		printf("error");
+	if (Magenta1.SetItemText(8, 2, TEXT("%")) == 0)
 		printf("error");
 
 
