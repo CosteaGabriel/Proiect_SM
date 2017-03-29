@@ -19,6 +19,12 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
+	void CProiect_SMDlg::generateNumbers(int length);
+	void CProiect_SMDlg::initializeNumbers();
+
+	void CProiect_SMDlg::insertionSort(int data[], int lenD);
+	void CProiect_SMDlg::bubbleSort(int data[], int lenD);
+	void CProiect_SMDlg::shellSort(int data[], int lenD);
 
 // Implementation
 protected:
@@ -31,8 +37,9 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void Add_Item_Col1();
+	afx_msg void Process_Info();
 	CListCtrl Magenta1;
-	afx_msg void Add_Item_Col2();
-	afx_msg void Add_Item_Col3();
+	afx_msg void Compare();
+	afx_msg void CPUID_Button();
+	afx_msg void RTDSC_Button();
 };

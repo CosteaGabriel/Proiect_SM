@@ -14,14 +14,8 @@
 #define new DEBUG_NEW
 #endif
 
-
-
-
-//Global variables
-int max_numbers_of_lines = 0;
-int number_lines_col1 = 0;
-int number_lines_col2 = 0;
-int number_lines_col3 = 0;
+#define VECTOR_SIZE 500 //numarul total de numere generate
+#define MAX_VAL 10000   //valoarea maxima pe care o poate lua un numar
 
 // CAboutDlg dialog used for App About
 class CAboutDlg : public CDialogEx
@@ -73,9 +67,10 @@ BEGIN_MESSAGE_MAP(CProiect_SMDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CProiect_SMDlg::Add_Item_Col1)
-	ON_BN_CLICKED(IDC_BUTTON2, &CProiect_SMDlg::Add_Item_Col2)
-	ON_BN_CLICKED(IDC_BUTTON3, &CProiect_SMDlg::Add_Item_Col3)
+	ON_BN_CLICKED(IDC_BUTTON1, &CProiect_SMDlg::Process_Info)
+	ON_BN_CLICKED(IDC_BUTTON2, &CProiect_SMDlg::Compare)
+	ON_BN_CLICKED(IDC_BUTTON3, &CProiect_SMDlg::CPUID_Button)
+	ON_BN_CLICKED(IDC_BUTTON4, &CProiect_SMDlg::RTDSC_Button)
 END_MESSAGE_MAP()
 
 
@@ -108,20 +103,14 @@ BOOL CProiect_SMDlg::OnInitDialog()
 		int cx
 		);
 	//inseram 3 coloana in List Control
-	if (Magenta1.InsertColumn(1, TEXT("Proprietate")) < 0)
-		printf("error");
-	if(Magenta1.InsertColumn(2, TEXT("Valoarea")) < 0)
-		printf("error");
-	if(Magenta1.InsertColumn(3, TEXT("Unitatea de masura"))<0)
-		printf("error");
+	Magenta1.InsertColumn(1, TEXT("Proprietate"));
+	Magenta1.InsertColumn(2, TEXT("Valoarea"));
+	Magenta1.InsertColumn(3, TEXT("Unitatea de masura"));
 
 	//setam dimensiunea coloanei la 150 pixeli
-	if(Magenta1.SetColumnWidth(0, 200) != 0)
-		printf("error");
-	if(Magenta1.SetColumnWidth(1, 150) != 0)
-		printf("error");
-	if(Magenta1.SetColumnWidth(2, 150) != 0)
-		printf("error");
+	Magenta1.SetColumnWidth(0, 200);
+	Magenta1.SetColumnWidth(1, 150);
+	Magenta1.SetColumnWidth(2, 150);
 
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
@@ -197,9 +186,71 @@ HCURSOR CProiect_SMDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+int *input_array = new int[VECTOR_SIZE]; //vectorul ce va fi folosit de algoritmul de sortare
+int *bkup_numbers = new int[VECTOR_SIZE]; //vector de rezerva folosit pentru reinitializarea  
+void CProiect_SMDlg::generateNumbers(int length) {
+	srand(time(NULL));
+	int i = 0;
+	for (i = 0; i < length; i++) {
+		input_array[i] = (rand() % MAX_VAL);
+		bkup_numbers[i] = input_array[i];
+	}
+}
+void CProiect_SMDlg::initializeNumbers() {
+	for (int i = 0; i < VECTOR_SIZE; i++)
+		input_array[i] = bkup_numbers[i];
+}
+//shell sort
+void CProiect_SMDlg::shellSort(int data[], int lenD)
+{
+	int inc = lenD / 2;
+	while (inc>0){
+		for (int i = inc; i<lenD; i++){
+			int tmp = data[i];
+			int j = i;
+			while (j >= inc && data[j - inc]>tmp){
+				data[j] = data[j - inc];
+				j = j - inc;
+			}
+			data[j] = tmp;
+		}
+		inc = (inc / 2);
+	}
+}
+//bubble sort
+void CProiect_SMDlg::bubbleSort(int data[], int lenD)
+{
+	int tmp = 0;
+	for (int i = 0; i<lenD; i++){
+		for (int j = (lenD - 1); j >= (i + 1); j--){
+			if (data[j]<data[j - 1]){
+				tmp = data[j];
+				data[j] = data[j - 1];
+				data[j - 1] = tmp;
+			}
+		}
+		/*CString txt;
+		txt.Format(TEXT("%d"), data[i]);
+		c_list.InsertItem(nItem++, txt);*/
+	}
+}
+//insertion sort
+void CProiect_SMDlg::insertionSort(int data[], int lenD)
+{
+	int key = 0;
+	int i = 0;
+	for (int j = 1; j<lenD; j++){
+		key = data[j];
+		i = j - 1;
+		while (i >= 0 && data[i]>key){
+			data[i + 1] = data[i];
+			i = i - 1;
+			data[i + 1] = key;
+		}
+	}
+}
 
-
-void CProiect_SMDlg::Add_Item_Col1()
+void CProiect_SMDlg::Process_Info()
 {
 	SYSTEM_INFO SysInfo;
 	MEMORYSTATUSEX MemoryInfo;
@@ -240,6 +291,35 @@ void CProiect_SMDlg::Add_Item_Col1()
 		LPCTSTR lpszText
 		);
 
+
+	LVCOLUMN aux_col; //variabila ce va contine datele coloanei
+	int column_index = 0; //column_index reprezinta indexul coloanei care va fi
+	//modificata
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+
+
+	aux_col.pszText = TEXT("Proprietate"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("Valoare"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("Unitatea de masura"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	Magenta1.DeleteAllItems();
+
 	//functii pentru aflarea informatiei HW-ului
 	GetPerformanceInfo(&PerformanceInfo, sizeof(PerformanceInfo));
 	GetSystemInfo(&SysInfo); 
@@ -248,142 +328,371 @@ void CProiect_SMDlg::Add_Item_Col1()
 	//Afisam page size
 	swprintf_s(buffer, 500, L"%d",  SysInfo.dwPageSize);
 
-	if (Magenta1.InsertItem(0, 0) < 0)
-		printf("error");
-
-	if (Magenta1.SetItemText(0, 0, TEXT("Dim pag memorie")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(0, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(0, 2, TEXT("bytes")) == 0)
-		printf("error");
+	Magenta1.InsertItem(0, 0);
+	Magenta1.SetItemText(0, 0, TEXT("Dim pag memorie"));
+	Magenta1.SetItemText(0, 1, buffer);
+	Magenta1.SetItemText(0, 2, TEXT("bytes"));
 
 	//Afisam minim virtual memory
 	swprintf_s(buffer, 500, L"%lu", SysInfo.lpMinimumApplicationAddress);
 
-	if (Magenta1.InsertItem(1, 0) < 0)
-		printf("error");
-
-	if (Magenta1.SetItemText(1, 0, TEXT("Adrs. minima de mem virt")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(1, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(1, 2, TEXT("Adress")) == 0)
-		printf("error");
+	Magenta1.InsertItem(1, 0);
+	Magenta1.SetItemText(1, 0, TEXT("Adrs. minima de mem virt"));
+	Magenta1.SetItemText(1, 1, buffer);
+	Magenta1.SetItemText(1, 2, TEXT("Adress"));
 	
 	//Afisam maxim virtual memory
 	swprintf_s(buffer, 500, L"%lu", SysInfo.lpMaximumApplicationAddress);
 
+	Magenta1.InsertItem(2, 0);
+	Magenta1.SetItemText(2, 0, TEXT("Adrs. maxima de mem virt"));
+	Magenta1.SetItemText(2, 1, buffer);
+	Magenta1.SetItemText(2, 2, TEXT("Adress"));
+
+	//Afisam total memory space
+	swprintf_s(buffer, 500, L"%lu", MemoryInfo.ullTotalPhys);
+
+	Magenta1.InsertItem(3, 0);
+
+	Magenta1.SetItemText(3, 0, TEXT("Total memory"));
+	Magenta1.SetItemText(3, 1, buffer);
+	Magenta1.SetItemText(3, 2, TEXT("bytes"));
+
+	//Afisam toal availlable physical memory
+	swprintf_s(buffer, 500, L"%lu", MemoryInfo.ullAvailPhys);
+
+	Magenta1.InsertItem(4, 0);
+
+	Magenta1.SetItemText(4, 0, TEXT("Total avl. mem"));
+	Magenta1.SetItemText(4, 1, buffer);;
+	Magenta1.SetItemText(4, 2, TEXT("bytes"));
+	
+	//Total SO memory
+	swprintf_s(buffer, 500, L"%u", PerformanceInfo.KernelTotal);
+
+	Magenta1.InsertItem(5, 0);
+	Magenta1.SetItemText(5, 0, TEXT("Total SO mem"));
+	Magenta1.SetItemText(5, 1, buffer);
+	Magenta1.SetItemText(5, 2, TEXT("pages"));
+	
+	//Total virtual memory
+	swprintf_s(buffer, 500, L"%u", MemoryInfo.ullTotalVirtual);
+	
+	Magenta1.InsertItem(6, 0);
+	Magenta1.SetItemText(6, 0, TEXT("Total virtual mem"));
+	Magenta1.SetItemText(6, 1, buffer);
+	Magenta1.SetItemText(6, 2, TEXT("bytes"));
+
+
+	//Available virtual memory
+	swprintf_s(buffer, 500, L"%u", MemoryInfo.ullAvailVirtual);
+
+	Magenta1.InsertItem(7, 0);
+	Magenta1.SetItemText(7, 0, TEXT("Available virtual mem"));
+	Magenta1.SetItemText(7, 1, buffer);
+	Magenta1.SetItemText(7, 2, TEXT("bytes"));
+
+	//Memor load
+	swprintf_s(buffer, 500, L"%d", MemoryInfo.dwMemoryLoad);
+
+	Magenta1.InsertItem(8, 0);
+	Magenta1.SetItemText(8, 0, TEXT("Memory load"));
+	Magenta1.SetItemText(8, 1, buffer);
+	Magenta1.SetItemText(8, 2, TEXT("%"));
+}
+
+void CProiect_SMDlg::Compare()
+{
+	LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
+	LARGE_INTEGER Frequency;
+	CString txt;
+
+	QueryPerformanceCounter(&Frequency);
+
+	int InsertItem(										//functie pentru inserarea unei linii
+		const LVITEM* pItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem,
+		int nImage
+		);
+	int InsertItem(
+		UINT nMask,
+		int nItem,
+		LPCTSTR lpszItem,
+		UINT nState,
+		UINT nStateMask,
+		int nImage,
+		LPARAM lParam
+		);
+
+	BOOL SetItemText(					//functie pt setarea textului unei linii
+		int nItem,
+		int nSubItem,
+		LPCTSTR lpszText
+		);
+
+
+
+	LVCOLUMN aux_col; //variabila ce va contine datele coloanei
+	int column_index = 0; //column_index reprezinta indexul coloanei care va fi
+	//modificata
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+
+
+
+	aux_col.pszText = TEXT("Alrgoritmu de sortare"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("Diferenta"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("Timp"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	Magenta1.DeleteAllItems();										
+
+
+
+	generateNumbers(VECTOR_SIZE);
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	bubbleSort(input_array, VECTOR_SIZE);
+	QueryPerformanceCounter(&EndingTime);
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+
+	Magenta1.InsertItem(0, 0);
+	Magenta1.SetItemText(0, 0, TEXT("Bubble Sort"));
+	Magenta1.SetItemText(0, 1, txt);
+
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	ElapsedMicroseconds.QuadPart /= Frequency.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.SetItemText(0, 2, txt);
+
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	insertionSort(input_array, VECTOR_SIZE);
+	QueryPerformanceCounter(&EndingTime);
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+
+	Magenta1.InsertItem(1, 0);
+	Magenta1.SetItemText(1, 0, TEXT("Insertion Sort"));
+	Magenta1.SetItemText(1, 1, txt);
+
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	ElapsedMicroseconds.QuadPart /= Frequency.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.SetItemText(1, 2, txt);
+
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	shellSort(input_array, VECTOR_SIZE);
+	QueryPerformanceCounter(&EndingTime);
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+
+	Magenta1.InsertItem(2, 0);
+	Magenta1.SetItemText(2, 0, TEXT("Shell Sort"));
+	Magenta1.SetItemText(2, 1, txt);
+
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	ElapsedMicroseconds.QuadPart /= Frequency.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.SetItemText(2, 2, txt);
+}
+
+
+void CProiect_SMDlg::CPUID_Button()
+{
+	int InsertItem(
+		const LVITEM* pItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem,
+		int nImage
+		);
+	int InsertItem(
+		UINT nMask,
+		int nItem,
+		LPCTSTR lpszItem,
+		UINT nState,
+		UINT nStateMask,
+		int nImage,
+		LPARAM lParam
+		);
+
+	BOOL SetItemText(
+		int nItem,
+		int nSubItem,
+		LPCTSTR lpszText
+		);
+
+
+	LVCOLUMN aux_col; //variabila ce va contine datele coloanei
+	int column_index = 0; //column_index reprezinta indexul coloanei care va fi
+	//modificata
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+
+
+
+	aux_col.pszText = TEXT("A"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("D"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("T"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	Magenta1.DeleteAllItems();										//variabila aux_col
+
+
+	wchar_t buffer[20];
+	int vendor_id, description, brand_id, ft_flags, nr_processors;
+
+	_asm{
+		mov eax, 0
+			cpuid
+			mov vendor_id, ebx
+
+			mov eax, 1
+			cpuid
+			mov description, eax
+			mov brand_id, ebx
+			mov ft_flags, edx
+
+			mov eax, 0Ah
+			cpuid
+			mov nr_processors, eax
+	}
+
+	//swprintf_s(buffer, 20, L"%d", vendor_id);
+	switch (vendor_id  & 0x3000)
+	{
+		case 0:
+			Magenta1.InsertItem(0, 0);
+			Magenta1.SetItemText(0, 0, TEXT("Processor Type"));
+			Magenta1.SetItemText(0, 1, TEXT("Original OEM rocessor"));
+			break;
+		case 0x1000:
+			Magenta1.InsertItem(0, 0);
+			Magenta1.SetItemText(0, 0, TEXT("Processor Type"));
+			Magenta1.SetItemText(0, 1, TEXT("Overdrive Processor"));
+			break;
+		case 0x2000:
+			Magenta1.InsertItem(0, 0);
+			Magenta1.SetItemText(0, 0, TEXT("Processor Type"));
+			Magenta1.SetItemText(0, 1, TEXT("Dual Processor"));
+			break;
+		default:
+			break;
+	}
+
+
+
+
+	
+	/*
+	Magenta1.InsertItem(2, 0);
+	Magenta1.SetItemText(2, 0, TEXT("Shell Sort"));
+	Magenta1.SetItemText(2, 1, txt);
+	*/
+	
+	swprintf_s(buffer, 20, L"%d", description);
+
+	Magenta1.InsertItem(1, 0);
+	Magenta1.SetItemText(1, 0, TEXT("Vendor ID"));
+	Magenta1.SetItemText(1, 0, buffer);
+
+
+
+	swprintf_s(buffer, 20, L"%d", brand_id);
 	if (Magenta1.InsertItem(2, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(2, 0, TEXT("Adrs. maxima de mem virt")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(2, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(2, 2, TEXT("Adress")) == 0)
+	if (Magenta1.SetItemText(2, 0, buffer) == 0)
 		printf("error");
 
-	//Afisam taotal memory space
-	swprintf_s(buffer, 500, L"%lu", MemoryInfo.ullTotalPhys);
 
+
+	swprintf_s(buffer, 20, L"%d", ft_flags);
 	if (Magenta1.InsertItem(3, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(3, 0, TEXT("Total memory")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(3, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(3, 2, TEXT("bytes")) == 0)
+	if (Magenta1.SetItemText(3, 0, buffer) == 0)
 		printf("error");
 
 
-	swprintf_s(buffer, 500, L"%lu", MemoryInfo.ullAvailPhys);
-
+	swprintf_s(buffer, 20, L"%d", nr_processors);
 	if (Magenta1.InsertItem(4, 0) < 0)
 		printf("error");
 
-	if (Magenta1.SetItemText(4, 0, TEXT("Total avl. mem")) == 0)
+	if (Magenta1.SetItemText(4, 0, buffer) == 0)
 		printf("error");
-	if (Magenta1.SetItemText(4, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(4, 2, TEXT("bytes")) == 0)
-		printf("error");
-	
-	
-	swprintf_s(buffer, 500, L"%u", PerformanceInfo.KernelTotal);
-
-	if (Magenta1.InsertItem(5, 0) < 0)
-		printf("error");
-
-	if (Magenta1.SetItemText(5, 0, TEXT("Total SO mem")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(5, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(5, 2, TEXT("pages")) == 0)
-		printf("error");
-	
-
-	swprintf_s(buffer, 500, L"%u", MemoryInfo.ullTotalVirtual);
-	
-	if (Magenta1.InsertItem(6, 0) < 0)
-		printf("error");
-
-	if (Magenta1.SetItemText(6, 0, TEXT("Total virtual mem")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(6, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(6, 2, TEXT("bytes")) == 0)
-		printf("error");
-
-
-	
-	swprintf_s(buffer, 500, L"%u", MemoryInfo.ullAvailVirtual);
-
-	if (Magenta1.InsertItem(7, 0) < 0)
-		printf("error");
-
-	if (Magenta1.SetItemText(7, 0, TEXT("Available virtual mem")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(7, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(7, 2, TEXT("bytes")) == 0)
-	    printf("error");
-
-
-	swprintf_s(buffer, 500, L"%d", MemoryInfo.dwMemoryLoad);
-
-	if (Magenta1.InsertItem(8, 0) < 0)
-		printf("error");
-
-	if (Magenta1.SetItemText(8, 0, TEXT("Memory load")) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(8, 1, buffer) == 0)
-		printf("error");
-	if (Magenta1.SetItemText(8, 2, TEXT("%")) == 0)
-		printf("error");
-
-
-	/*if (number_lines_col1 < max_numbers_of_lines)  //daca in coloana nu avem mai multe linii de cat numarul maxim de linii  
-	{                                              //at scriem doar textul in indexul cu valoarea stocata in number_lines_col1
-		if (Magenta1.SetItemText(number_lines_col1, 0, t) == 0)
-			printf("error");
-		number_lines_col1++;
-	}
-	else{											//altfel inseram o linie si scriem textul dar si crestem numarul maxim de linii
-		if (Magenta1.InsertItem(number_lines_col1, 0) < 0)
-			printf("error");
-		if (Magenta1.SetItemText(number_lines_col1, 0, t) == 0)
-			printf("error");
-		number_lines_col1++;
-		max_numbers_of_lines++;
-	}*/
-
-
+		
 }
 
-void CProiect_SMDlg::Add_Item_Col2()
+
+void CProiect_SMDlg::RTDSC_Button()
 {
+
+	wchar_t buffer[20];
+	LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
+	LARGE_INTEGER Frequency;
+	CString txt;
+
+
 	int InsertItem(
 		const LVITEM* pItem
 		);
@@ -414,66 +723,166 @@ void CProiect_SMDlg::Add_Item_Col2()
 
 
 
-	if (number_lines_col2 < max_numbers_of_lines)    
-	{
-		if (Magenta1.SetItemText(number_lines_col2, 1, TEXT("ELEMENT 2")) == 0)
-			printf("error");
-		number_lines_col2++;
+
+	LVCOLUMN aux_col; //variabila ce va contine datele coloanei
+	int column_index = 0; //column_index reprezinta indexul coloanei care va fi
+	//modificata
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+
+
+	aux_col.pszText = TEXT("Proprietate"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("Valoare"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT(""); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	Magenta1.DeleteAllItems();
+
+
+	unsigned long ticks_start = 0, ticks_stop = 0, freq = 0;
+
+	_asm{
+		rdtsc
+			mov ticks_start, edx
+			shl ticks_start, 32
+			xor ticks_start, eax
 	}
-	else{
-		if (Magenta1.InsertItem(number_lines_col2, 0) < 0)
-			printf("error");
-		if (Magenta1.SetItemText(number_lines_col2, 1, TEXT("ELEMENT 2")) == 0)
-			printf("error");
-		number_lines_col2++;
-		max_numbers_of_lines++;
+
+	Sleep(1000);
+	_asm{
+		rdtsc
+			mov ticks_stop, edx
+			shl ticks_stop, 32
+			xor ticks_stop, eax
 	}
-}
+
+	freq = (ticks_stop - ticks_start) / 1000000;
+
+	swprintf_s(buffer, 20, L"%d", freq);
+
+	Magenta1.InsertItem(0, 0);
+	Magenta1.SetItemText(0, 0, TEXT("Frecventa curenta a procesorului"));
+	Magenta1.SetItemText(0, 1, buffer);
+
+	SetThreadAffinityMask(GetCurrentThread(), 1 << 1);
+
+	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+
+	for (int i = 0; i < 10000; i++)
+		for (int j = 0; j < 10000; j++)
+			for (int k = 0; k < 5; k++);
+
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.InsertItem(1, 0);
+	Magenta1.SetItemText(1, 0, TEXT("BELOW NORMAL PRIORITY CLASS"));
+	Magenta1.SetItemText(1, 1, txt);
+
+	
+
+	SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+
+	for (int i = 0; i < 10000; i++)
+		for (int j = 0; j < 10000; j++)
+			for (int k = 0; k < 5; k++);
+
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.InsertItem(2, 0);
+	Magenta1.SetItemText(2, 0, TEXT("NORMAL PRIORITY CLASS"));
+	Magenta1.SetItemText(2, 1, txt);
+
+	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+
+	for (int i = 0; i < 10000; i++)
+		for (int j = 0; j < 10000; j++)
+			for (int k = 0; k < 5; k++);
+
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+
+	Magenta1.InsertItem(3, 0);
+	Magenta1.SetItemText(3, 0, TEXT("HIGH PRIORITY CLASS"));
+	Magenta1.SetItemText(3, 1, txt);
 
 
-void CProiect_SMDlg::Add_Item_Col3()
-{
-	int InsertItem(
-		const LVITEM* pItem
-		);
-	int InsertItem(
-		int nItem,
-		LPCTSTR lpszItem
-		);
-	int InsertItem(
-		int nItem,
-		LPCTSTR lpszItem,
-		int nImage
-		);
-	int InsertItem(
-		UINT nMask,
-		int nItem,
-		LPCTSTR lpszItem,
-		UINT nState,
-		UINT nStateMask,
-		int nImage,
-		LPARAM lParam
-		);
-
-	BOOL SetItemText(
-		int nItem,
-		int nSubItem,
-		LPCTSTR lpszText
-		);
+//#############################################################################################################################//
 
 
-	if (number_lines_col3 < max_numbers_of_lines)
-	{
-		if (Magenta1.SetItemText(number_lines_col3, 2, TEXT("ELEMENT 3")) == 0)
-			printf("error");
-		number_lines_col3++;
-	}
-	else{
-		if (Magenta1.InsertItem(number_lines_col3, 0) < 0)
-			printf("error");
-		if (Magenta1.SetItemText(number_lines_col3, 2, TEXT("ELEMENT 3")) == 0)
-			printf("error");
-		number_lines_col3++;
-		max_numbers_of_lines++;
-	}
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+
+	for (int i = 0; i < 10000; i++)
+		for (int j = 0; j < 10000; j++)
+			for (int k = 0; k < 5; k++);
+
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.InsertItem(4, 0);
+	Magenta1.SetItemText(4, 0, TEXT("THREAD_PRIORITY_LOWEST"));
+	Magenta1.SetItemText(4, 1, txt);
+
+
+
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+
+	for (int i = 0; i < 10000; i++)
+		for (int j = 0; j < 10000; j++)
+			for (int k = 0; k < 5; k++);
+
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.InsertItem(5, 0);
+	Magenta1.SetItemText(5, 0, TEXT("THREAD_PRIORITY_NORMAL"));
+	Magenta1.SetItemText(5, 1, txt);
+
+	
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+
+	for (int i = 0; i < 10000; i++)
+		for (int j = 0; j < 10000; j++)
+			for (int k = 0; k < 5; k++);
+
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	txt.Format(TEXT("%lld"), ElapsedMicroseconds.QuadPart);
+	Magenta1.InsertItem(6, 0);
+	Magenta1.SetItemText(6, 0, TEXT("THREAD_PRIORITY_HIGHEST"));
+	Magenta1.SetItemText(6, 1, txt);
 }
