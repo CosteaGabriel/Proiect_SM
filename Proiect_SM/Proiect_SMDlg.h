@@ -42,4 +42,5 @@ public:
 	afx_msg void Compare();
 	afx_msg void CPUID_Button();
 	afx_msg void RTDSC_Button();
+	afx_msg void OnBnClickedButton_PCI();
 };

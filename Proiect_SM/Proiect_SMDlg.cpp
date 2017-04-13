@@ -6,7 +6,7 @@
 #include "Proiect_SM.h"
 #include "Proiect_SMDlg.h"
 #include "afxdialogex.h"
-
+#include <conio.h>
 #include <Psapi.h>
 
 
@@ -16,6 +16,22 @@
 
 #define VECTOR_SIZE 500 //numarul total de numere generate
 #define MAX_VAL 10000   //valoarea maxima pe care o poate lua un numar
+
+typedef struct 	_PCI_INFO
+{
+	WORD Vendor_ID;
+	char Vendor_Name[100];
+	WORD Device_ID;
+	char Device_Name[100];
+	BYTE Reg;
+	BYTE Bus;
+	BYTE Dev;
+	BYTE Fun;
+	WORD SMB_Address;
+}PCI_INFO;
+
+
+PCI_INFO pci_v;
 
 // CAboutDlg dialog used for App About
 class CAboutDlg : public CDialogEx
@@ -71,6 +87,7 @@ BEGIN_MESSAGE_MAP(CProiect_SMDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CProiect_SMDlg::Compare)
 	ON_BN_CLICKED(IDC_BUTTON3, &CProiect_SMDlg::CPUID_Button)
 	ON_BN_CLICKED(IDC_BUTTON4, &CProiect_SMDlg::RTDSC_Button)
+	ON_BN_CLICKED(IDC_BUTTON5, &CProiect_SMDlg::OnBnClickedButton_PCI)
 END_MESSAGE_MAP()
 
 
@@ -885,4 +902,98 @@ void CProiect_SMDlg::RTDSC_Button()
 	Magenta1.InsertItem(6, 0);
 	Magenta1.SetItemText(6, 0, TEXT("THREAD_PRIORITY_HIGHEST"));
 	Magenta1.SetItemText(6, 1, txt);
+}
+
+void get_PCI_info(PCI_INFO pci_v)
+{
+	unsigned long adress_reg;
+
+	adress_reg |= (pci_v.Bus << 16) && 0xFFF;
+	adress_reg |= (pci_v.Bus << 11) && 0xFFF;
+	adress_reg |= (pci_v.Fun << 8) && 0xFFF;
+	adress_reg |= (pci_v.Reg) && 0xFFF;
+
+	_outpd(0xCF8, adress_reg);
+
+	if (_inpd(0xCFC) != 0 && _inpd(0xCFC) != 0xFFFFFFFF)
+	{
+		pci_v.Vendor_ID = _inpd(0xCF8);
+	}
+
+}
+
+void scan_PCI()
+{
+		for (pci_v.Bus = 0; pci_v.Bus < 8; pci_v.Bus++)
+		{
+			for (pci_v.Dev = 0; pci_v.Dev < 5; pci_v.Dev++)
+			{
+				for (pci_v.Fun = 0; pci_v.Fun < 3; pci_v.Fun++)
+				{
+					get_PCI_info(pci_v);
+				}
+			}
+		}
+}
+
+void CProiect_SMDlg::OnBnClickedButton_PCI()
+{
+
+	pci_v.Reg = 0x00;
+	wchar_t buffer[255];
+	CString txt;
+
+
+	HANDLE hDevice;
+	hDevice = CreateFile(TEXT("\\\\.\\Giveio"),(GENERIC_READ | GENERIC_WRITE),
+		0,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL
+		);
+	if (hDevice == INVALID_HANDLE_VALUE)
+	{
+		printf("Error: %d", GetLastError());
+	}
+
+
+	int InsertItem(
+		const LVITEM* pItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem
+		);
+	int InsertItem(
+		int nItem,
+		LPCTSTR lpszItem,
+		int nImage
+		);
+	int InsertItem(
+		UINT nMask,
+		int nItem,
+		LPCTSTR lpszItem,
+		UINT nState,
+		UINT nStateMask,
+		int nImage,
+		LPARAM lParam
+		);
+
+	BOOL SetItemText(
+		int nItem,
+		int nSubItem,
+		LPCTSTR lpszText
+		);
+
+
+	scan_PCI();
+
+	txt.Format(TEXT("%lld"), pci_v.Vendor_ID);
+	Magenta1.InsertItem(0, 0);
+	Magenta1.SetItemText(0, 0, TEXT("Vendor ID"));
+	Magenta1.SetItemText(0, 1, txt);
+
+
+	CloseHandle(hDevice);
 }
