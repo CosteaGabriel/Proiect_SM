@@ -43,4 +43,6 @@ public:
 	afx_msg void CPUID_Button();
 	afx_msg void RTDSC_Button();
 	afx_msg void OnBnClickedButton_PCI();
+	afx_msg void OnBnClickedButton_SSE();
+	afx_msg void OnBnClicked_Variable_Memory();
 };

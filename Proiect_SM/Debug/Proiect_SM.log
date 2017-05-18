@@ -1,11 +1,16 @@
-﻿Build started 4/13/2017 9:23:49 PM.
+﻿Build started 4/28/2017 9:37:34 AM.
      1>Project "E:\AutomaticaSiCalculatoare\Anul_III\Sem_II\SM\Proiect_SM\Proiect_SM\Proiect_SM.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\Proiect_SM.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Proiect_SMDlg.cpp
          Proiect_SMDlg.cpp
-     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(209): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(920): warning C4244: '=' : conversion from 'unsigned long' to 'WORD', possible loss of data
-     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(943): warning C4101: 'buffer' : unreferenced local variable
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(39): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(40): warning C4305: 'initializing' : truncation from 'double' to 'float'
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(231): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(942): warning C4244: '=' : conversion from 'unsigned long' to 'WORD', possible loss of data
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(965): warning C4101: 'buffer' : unreferenced local variable
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(1051): warning C4244: 'initializing' : conversion from 'int' to 'float', possible loss of data
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(1069): warning C4101: 'i' : unreferenced local variable
+     1>e:\automaticasicalculatoare\anul_iii\sem_ii\sm\proiect_sm\proiect_sm\proiect_smdlg.cpp(1208): warning C4244: 'initializing' : conversion from 'LONGLONG' to 'float', possible loss of data
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\AutomaticaSiCalculatoare\Anul_III\Sem_II\SM\Proiect_SM\Debug\Proiect_SM.exe" /INCREMENTAL /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"E:\AutomaticaSiCalculatoare\Anul_III\Sem_II\SM\Proiect_SM\Debug\Proiect_SM.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\AutomaticaSiCalculatoare\Anul_III\Sem_II\SM\Proiect_SM\Debug\Proiect_SM.lib" /MACHINE:X86 Debug\Proiect_SM.res
          Debug\Proiect_SM.obj
@@ -16,4 +21,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:16.85
+Time Elapsed 00:00:00.74

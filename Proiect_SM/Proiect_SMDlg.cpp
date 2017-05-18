@@ -8,7 +8,9 @@
 #include "afxdialogex.h"
 #include <conio.h>
 #include <Psapi.h>
+#include <intrin.h>
 
+#pragma intrinsic ( _mm_hadd_ps )
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,6 +34,24 @@ typedef struct 	_PCI_INFO
 
 
 PCI_INFO pci_v;
+
+
+__declspec(align(16)) float v1[4] = { 1.1, 2.2, 3.3, 4.4 };
+__declspec(align(16)) float v2[4] = { 8.9, 7.8, 6.7, 5.6 };
+__declspec(align(16)) float mat[4][4] = { { 1, 2, 3,9}, { 4, 5, 6,8}, { 7, 8, 9,7 }, { 1, 2, 3, 4 } };
+__declspec(align(16)) float matt[4][4] = { { 1, 2, 3, 9 }, { 4, 5, 6, 8 }, { 7, 8, 9, 7 }, { 1, 2, 3, 4 } };
+__declspec(align(16)) float vec[4] = { 3, 1, 2,8 };
+__m128 u, v, w;
+
+
+//gobal variables 
+int n1 = 0xffffffff;
+unsigned int n2 = 0xffffffff;
+float f1 = 5.5;
+double f2 = 5.5;
+int *p1 = &n1;
+char *s1 = "Hello world!";
+
 
 // CAboutDlg dialog used for App About
 class CAboutDlg : public CDialogEx
@@ -88,6 +108,8 @@ BEGIN_MESSAGE_MAP(CProiect_SMDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON3, &CProiect_SMDlg::CPUID_Button)
 	ON_BN_CLICKED(IDC_BUTTON4, &CProiect_SMDlg::RTDSC_Button)
 	ON_BN_CLICKED(IDC_BUTTON5, &CProiect_SMDlg::OnBnClickedButton_PCI)
+	ON_BN_CLICKED(IDC_BUTTON6, &CProiect_SMDlg::OnBnClickedButton_SSE)
+	ON_BN_CLICKED(IDC_BUTTON7, &CProiect_SMDlg::OnBnClicked_Variable_Memory)
 END_MESSAGE_MAP()
 
 
@@ -120,9 +142,9 @@ BOOL CProiect_SMDlg::OnInitDialog()
 		int cx
 		);
 	//inseram 3 coloana in List Control
-	Magenta1.InsertColumn(1, TEXT("Proprietate"));
-	Magenta1.InsertColumn(2, TEXT("Valoarea"));
-	Magenta1.InsertColumn(3, TEXT("Unitatea de masura"));
+	Magenta1.InsertColumn(0, TEXT("Proprietate"));
+	Magenta1.InsertColumn(1, TEXT("Valoarea"));
+	Magenta1.InsertColumn(2, TEXT("Unitatea de masura"));
 
 	//setam dimensiunea coloanei la 150 pixeli
 	Magenta1.SetColumnWidth(0, 200);
@@ -996,4 +1018,447 @@ void CProiect_SMDlg::OnBnClickedButton_PCI()
 
 
 	CloseHandle(hDevice);
+}
+
+void add_2_V(float v1[], float v2[])
+{
+	int i;
+
+	for (i = 0; i < 4; i++)
+	{
+		v1[i] += v2[i];
+	}
+}
+
+
+void hadds_SSE(float v1[], float v2[])
+{
+	u = _mm_load_ps(v1);
+	v = _mm_load_ps(v2);
+
+	w = _mm_hadd_ps(u, v);
+}
+
+
+void scalar(int x, float v[]){
+	int i;
+	for (i = 0; i < 4; i++)
+		v[i] *= x;
+
+}
+void scalar_SSE(int x, float v1[]) {
+	u = _mm_load_ps(v1);
+	__declspec(align(16)) float vv[4] = { x, x, x, x };
+
+	v = _mm_load_ps(vv);
+
+	w = _mm_mul_ps(u, v);
+}
+
+void mat_vec(float mat[4][4], float v[]) {
+	int i;
+	for (i = 0; i < 4; i++){
+		v[i] *= mat[i][1];
+	}
+
+	
+		
+}
+
+void mat_vect_SSE(float mat[4][4], float vv[]) {
+	int i;
+	__declspec(align(16)) float mat1[4] = { mat[0][1], mat[1][1], mat[2][1], mat[3][1] };
+	u = _mm_load_ps(vv);
+	v = _mm_load_ps(mat1);
+	w = _mm_mul_ps(u, v);
+}
+
+void mat_mat(float mat1[4][4], float mat2[4][4]){
+	int i,j,k,t;
+	float aux[4],matrez[4][4];
+	for (i = 0; i < 4; i++){
+		k = 0;
+		for (j = 0; j < 4; j++) {
+			
+			aux[i] = mat1[i][j] * mat[j][k];
+			k++;
+		}
+
+		for (t = 0; t < 4; t++)
+			matrez[i][t] += aux[t];
+	}
+}
+
+void mat_mat_SSE(float mat1[4][4], float mat2[4][4]){
+	float matrez[4][4];
+	int i, j;
+	float vectorr[4];
+	__declspec(align(16)) float aux[4];
+	for (int k = 0; k < 4; k++){
+		for (j = 0; j < 4; j++){
+			for (i = 0; i < 4; i++)
+				aux[i] = mat2[i][j];
+			u = _mm_load_ps(mat1[j]);
+			v = _mm_load_ps(aux);
+			w = _mm_mul_ps(u, v);
+
+			_mm_storeu_ps(vectorr, w);
+
+			for (i = 0; i < 4; i++)
+				matrez[k][j] += vectorr[i];
+		}
+
+	}
+
+}
+void CProiect_SMDlg::OnBnClickedButton_SSE()
+{
+	LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
+	LARGE_INTEGER Frequency;
+	CString txt;
+
+	QueryPerformanceCounter(&Frequency);
+	
+	float elapsed;
+
+	LVCOLUMN aux_col; //variabila ce va contine datele coloanei
+	int column_index = 0; //column_index reprezinta indexul coloanei care va fi	modificata
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+
+
+
+	aux_col.pszText = TEXT(""); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+	//column_index si se stocheaza in
+	//variabila aux_col
+	aux_col.pszText = TEXT("Timp"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+
+	column_index++;
+
+
+	Magenta1.DeleteAllItems();
+
+	//////////////////////////////////
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	add_2_V(v1,v2);
+	QueryPerformanceCounter(&EndingTime);
+
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	elapsed = ((float)ElapsedMicroseconds.QuadPart) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	 
+
+	///////////////////////////////////////////////////
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	hadds_SSE(v1, v2);
+	QueryPerformanceCounter(&EndingTime);
+
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	elapsed = ((float)ElapsedMicroseconds.QuadPart) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	Magenta1.InsertItem(1, 0);
+	Magenta1.SetItemText(1, 0, TEXT("Adunarea a doi vecori cu SSE"));
+	Magenta1.SetItemText(1, 1, txt);
+
+	//////////////////////////////////
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	scalar(5, v2);
+	QueryPerformanceCounter(&EndingTime);
+
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	elapsed = ((float)ElapsedMicroseconds.QuadPart) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	Magenta1.InsertItem(2, 0);
+	Magenta1.SetItemText(2, 0, TEXT("Inmultire cu scalar"));
+	Magenta1.SetItemText(2, 1, txt);
+
+	///////////////////////////////////////////////////
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	scalar_SSE(5, v2);
+	scalar_SSE(5, v2);
+	QueryPerformanceCounter(&EndingTime);
+
+
+	float a = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	a *= 1000000;
+	elapsed = ((float)a) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	Magenta1.InsertItem(3, 0);
+	Magenta1.SetItemText(3, 0, TEXT("Inmultire cu scalar cu SSE"));
+	Magenta1.SetItemText(3, 1, txt);
+
+
+
+	//////////////////////////////////
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	mat_vec(mat, vec);
+	QueryPerformanceCounter(&EndingTime);
+
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	elapsed = ((float)ElapsedMicroseconds.QuadPart) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	Magenta1.InsertItem(4, 0);
+	Magenta1.SetItemText(4, 0, TEXT("Inmultire matrice cu vector"));
+	Magenta1.SetItemText(4, 1, txt);
+
+	///////////////////////////////////////////////////
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	mat_vect_SSE(mat, vec);
+
+	QueryPerformanceCounter(&EndingTime);
+
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	elapsed = ((float)ElapsedMicroseconds.QuadPart) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	Magenta1.InsertItem(5, 0);
+	Magenta1.SetItemText(5, 0, TEXT("Inmultire mat cu vect cu SSE"));
+	Magenta1.SetItemText(5, 1, txt);
+
+	//////////////////////////////////
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	mat_mat(mat, matt);
+	QueryPerformanceCounter(&EndingTime);
+
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	elapsed = ((float)ElapsedMicroseconds.QuadPart) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	Magenta1.InsertItem(6, 0);
+	Magenta1.SetItemText(6, 0, TEXT("Inmultire matrice cu matrice"));
+	Magenta1.SetItemText(6, 1, txt);
+
+	//////////////////////////////////
+
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+	mat_mat_SSE(mat, matt);
+	QueryPerformanceCounter(&EndingTime);
+
+
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	ElapsedMicroseconds.QuadPart *= 1000000;
+	elapsed = ((float)ElapsedMicroseconds.QuadPart) / Frequency.QuadPart;
+
+	txt.Format(TEXT("%f"), elapsed);
+
+	Magenta1.InsertItem(7, 0);
+	Magenta1.SetItemText(7, 0, TEXT("Inmultire matrice cu matrice cu SSE"));
+	Magenta1.SetItemText(7, 1, txt);
+}
+
+
+void CProiect_SMDlg::OnBnClicked_Variable_Memory()
+{
+
+	int line_index = 0; //line_index reprezinta indexul linei care va fi	modificata
+	int colum_index = 0;//column_index reprezinta indexul coloanei care va fi	modificata
+	int size = 0;
+
+
+	CString txt;
+	
+	Magenta1.DeleteAllItems();
+	Magenta1.DeleteColumn(3);
+	Magenta1.DeleteColumn(4);
+	Magenta1.DeleteColumn(5);
+	Magenta1.DeleteColumn(6);
+
+	Magenta1.InsertColumn(3, TEXT(""));
+	Magenta1.InsertColumn(4, TEXT(""));
+	Magenta1.InsertColumn(5, TEXT(""));
+
+	//setam dimensiunea coloanei la 150 pixeli
+	Magenta1.SetColumnWidth(3, 200);
+	Magenta1.SetColumnWidth(4, 150);
+	Magenta1.SetColumnWidth(5, 150);
+
+
+	LVCOLUMN aux_col; //variabila ce va contine datele coloanei
+	int column_index = 0; //column_index reprezinta indexul coloanei care va fi
+	//modificata
+	Magenta1.GetColumn(column_index, &aux_col); //se obtin datele coloanei cu indexul
+
+
+	aux_col.pszText = TEXT("Name"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+	column_index++;
+
+	aux_col.pszText = TEXT("Memory Address"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+	column_index++;
+
+	aux_col.pszText = TEXT("Size"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+	column_index++;
+
+	aux_col.pszText = TEXT("Encoding"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+	column_index++;
+
+	aux_col.pszText = TEXT("Aligment"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+	column_index++;
+
+	aux_col.pszText = TEXT("Value"); //se modifica titlul coloanei
+	Magenta1.SetColumn(column_index, &aux_col); //se seteaza noile date ale coloanei
+	column_index++;
+
+
+
+	txt.Format(TEXT("%d"), &n1);
+	Magenta1.InsertItem(line_index, 0);
+	Magenta1.SetItemText(line_index, 0, TEXT("n1"));
+	Magenta1.SetItemText(line_index, 1, txt);
+
+
+	size = sizeof(n1);
+
+
+	txt.Format(TEXT("%d"), size);
+	Magenta1.SetItemText(line_index, 2, txt);
+
+	Magenta1.SetItemText(line_index, 3, TEXT("Complement de 2"));
+
+	Magenta1.SetItemText(line_index, 4, TEXT(""));
+	
+	txt.Format(TEXT("%d"), n1);
+	Magenta1.SetItemText(line_index, 5, txt);
+
+	line_index++;
+/////////////////////////////////////////////////////////////////////////////////////////
+	txt.Format(TEXT("%d"), &n2);
+	Magenta1.InsertItem(line_index, 0);
+	Magenta1.SetItemText(line_index, 0, TEXT("n2"));
+	Magenta1.SetItemText(line_index, 1, txt);
+
+	size = sizeof(n2);
+	txt.Format(TEXT("%d"), size);
+	Magenta1.SetItemText(line_index, 2, txt);
+
+	Magenta1.SetItemText(line_index, 3, TEXT("Semn-Marime"));
+
+	Magenta1.SetItemText(line_index, 4, TEXT(""));
+
+	txt.Format(TEXT("%d"), n2);
+	Magenta1.SetItemText(line_index, 5, txt);
+
+	line_index++;
+	/////////////////////////////////////////////////////
+	txt.Format(TEXT("%f"), &f1);
+	Magenta1.InsertItem(line_index, 0);
+	Magenta1.SetItemText(line_index, 0, TEXT("f1"));
+	Magenta1.SetItemText(line_index, 1, txt);
+
+	size = sizeof(f1);
+	txt.Format(TEXT("%d"), size);
+	Magenta1.SetItemText(line_index, 2, txt);
+
+	Magenta1.SetItemText(line_index, 3, TEXT("IEEE"));
+
+	Magenta1.SetItemText(line_index, 4, TEXT(""));
+
+	txt.Format(TEXT("%f"), f1);
+	Magenta1.SetItemText(line_index, 5, txt);
+
+	line_index++;
+	//////////////////////////////////////////////
+	txt.Format(TEXT("%f"), &f2);
+	Magenta1.InsertItem(line_index, 0);
+	Magenta1.SetItemText(line_index, 0, TEXT("f2"));
+	Magenta1.SetItemText(line_index, 1, txt);
+
+	size = sizeof(f2);
+	txt.Format(TEXT("%d"), size);
+	Magenta1.SetItemText(line_index, 2, txt);
+
+	Magenta1.SetItemText(line_index, 3, TEXT("IEEE"));
+
+	Magenta1.SetItemText(line_index, 4, TEXT(""));
+
+	txt.Format(TEXT("%f"), f2);
+	Magenta1.SetItemText(line_index, 5, txt);
+
+	line_index++;
+	////////////////////////////////////////////////
+	txt.Format(TEXT("%d"), p1);
+	Magenta1.InsertItem(line_index, 0);
+	Magenta1.SetItemText(line_index, 0, TEXT("p1"));
+	Magenta1.SetItemText(line_index, 1, txt);
+
+	size = sizeof(p1);
+	txt.Format(TEXT("%d"), size);
+	Magenta1.SetItemText(line_index, 2, txt);
+
+	Magenta1.SetItemText(line_index, 3, TEXT("Complement de 2"));
+
+	Magenta1.SetItemText(line_index, 4, TEXT(""));
+
+	txt.Format(TEXT("%d"), p1);
+	Magenta1.SetItemText(line_index, 5, txt);
+
+	line_index++;
+	////////////////////////////////////////////
+	txt.Format(TEXT("%d"), &s1);
+	Magenta1.InsertItem(line_index, 0);
+	Magenta1.SetItemText(line_index, 0, TEXT("s1"));
+	Magenta1.SetItemText(line_index, 1, txt);
+
+	size = sizeof(s1);
+	txt.Format(TEXT("%d"), size);
+	Magenta1.SetItemText(line_index, 2, txt);
+
+	Magenta1.SetItemText(line_index, 3, TEXT("UTF-8"));
+
+	Magenta1.SetItemText(line_index, 4, TEXT(""));
+
+	txt.Format(TEXT("%s"), s1);
+	Magenta1.SetItemText(line_index, 5, txt);
+
+	line_index++;
 }
